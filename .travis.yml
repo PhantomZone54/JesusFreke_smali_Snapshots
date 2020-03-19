@@ -34,16 +34,8 @@ script:
   - cd $TRAVIS_BUILD_DIR/smali
   - chmod a+x ./gradlew
   - ./gradlew clean &>/dev/null
-  - ./gradlew build &>/dev/null
-  - du -sh smali/build/libs/*.jar; du -sh baksmali/build/libs/*.jar
-  - cp -a smali/build/libs/*.jar baksmali/build/libs/*.jar $TRAVIS_BUILD_DIR/release/
-  - ./gradlew clean &>/dev/null
   - ./gradlew build proguard &>/dev/null
-  - du -sh smali/build/libs/*.jar; du -sh baksmali/build/libs/*.jar
   - cp -a smali/build/libs/*.jar baksmali/build/libs/*.jar $TRAVIS_BUILD_DIR/release/
-  - cd $TRAVIS_BUILD_DIR/release/
-  - ls -lAh .
-  - du -sh *
 
 before_deploy:
   - cd $TRAVIS_BUILD_DIR
@@ -56,13 +48,14 @@ before_deploy:
 
 deploy:
   provider: releases
-  api_key: $GitOAUTHToken
+  edge: true
+  token: $GitOAUTHToken
   file_glob: true
   file: "$TRAVIS_BUILD_DIR/release/*.jar"
   overwrite: true
-  skip_cleanup: true
+  cleanup: true
   name: "smali & baksmali Snapshot"
-  body: "Weekly Build Snapshot"
+  release_notes: "Weekly Build Snapshot"
   on:
     tags: false
     condition: "$TRAVIS_OS_NAME = linux"
