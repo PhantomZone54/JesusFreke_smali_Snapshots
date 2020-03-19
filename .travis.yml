@@ -1,0 +1,64 @@
+os: linux
+dist: xenial
+
+language: java
+
+env:
+  global:
+    - TERM=xterm-256color
+    - GROOVY_TURN_OFF_JAVA_WARNINGS=true
+
+jobs:
+  include:
+    - jdk: openjdk8
+      env:
+        - Releaser=YES
+    - dist: bionic
+      jdk: oraclejdk11
+    - os: osx
+      osx_image: xcode9.3
+    - os: windows
+      language: shell
+
+git:
+  depth: 1
+
+addons:
+  apt:
+    update: true
+    packages: tree
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
+install:
+  - git clone https://github.com/JesusFreke/smali.git --single-branch $TRAVIS_BUILD_DIR/smali
+
+script:
+  - cd $TRAVIS_BUILD_DIR/smali
+  - |
+    chmod a+x ./gradlew
+    if [ "$TRAVIS_OS_NAME" = "windows" ]; then
+      export GRADLE_OPTS=-Dorg.gradle.daemon=false
+      choco install jdk8
+      export PATH=$PATH:"/c/Program Files/Java/jdk1.8.0_211/bin"
+      export JAVA_HOME="/c/Program Files/Java/jdk1.8.0_211"
+      ./gradlew.bat clean
+      ./gradlew.bat build shadowJar proguard
+    else
+      ./gradlew clean
+      ./gradlew build shadowJar proguard
+    fi
+
+after_success:
+  - cd $TRAVIS_BUILD_DIR/smali
+  - ls -laR .
+  - tree
+
+branches:
+  only:
+    - master
+  except:
+    - /^(?i:untagged)-.*$/
