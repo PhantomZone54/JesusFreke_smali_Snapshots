@@ -11,6 +11,8 @@ env:
 jobs:
   include:
     - jdk: openjdk8
+      env:
+        - Releaser=YES
     - dist: bionic
       jdk: oraclejdk11
     - os: osx
@@ -22,7 +24,6 @@ git:
 addons:
   apt:
     update: true
-    packages: tree
 
 cache:
   directories:
@@ -33,18 +34,39 @@ install:
   - git clone https://github.com/JesusFreke/smali.git --single-branch $TRAVIS_BUILD_DIR/smali
 
 script:
+  - mkdir -p $TRAVIS_BUILD_DIR/release
   - cd $TRAVIS_BUILD_DIR/smali
   - chmod a+x ./gradlew
-  - ./gradlew clean 1>/dev/null
-  - ./gradlew build 1>/dev/null
+  - ./gradlew clean &>/dev/null
+  - ./gradlew build &>/dev/null
+  - cp -a smali/build/libs/*.jar baksmali/build/libs/*.jar $TRAVIS_BUILD_DIR/release/
+  - ./gradlew clean &>/dev/null
+  - ./gradlew build proguard &>/dev/null
+  - cp -a smali/build/libs/*.jar baksmali/build/libs/*.jar $TRAVIS_BUILD_DIR/release/
+  - cd $TRAVIS_BUILD_DIR/release/
+  - du -sh *
 
-after_success:
-  - cd $TRAVIS_BUILD_DIR/smali
-  - ls -aR . > ../list.txt
-  - tree > ../tree.txt
-  - cd ../
-  - curl -i -F filedata=@list.txt -F filedata=@tree.txt https://file.io && echo ""
-  - curl -i -F filedata=@list.txt -F filedata=@tree.txt https://transfer.sh || true
+before_deploy:
+  - cd $TRAVIS_BUILD_DIR
+  - git config --global user.email "rokibhasansagar2014@outlook.com"
+  - git config --global user.name "rokibhasansagar"
+  - git pull -q --tags || true
+  - git push -f -d https://$GitOAUTHToken@github.com/${TRAVIS_REPO_SLUG}.git $(git tag -l "*") || true
+  - git tag -d $(git tag -l "*") || true 
+  - git tag -f Snapshot || true
+
+deploy:
+  provider: releases
+  api_key: $GitOAUTHToken
+  file_glob: true
+  file: "$TRAVIS_BUILD_DIR/release/*.jar"
+  overwrite: true
+  skip_cleanup: true
+  name: "smali & baksmali Snapshot"
+  body: "Weekly Build Snapshot"
+  on:
+    tags: false
+    condition: "$Releaser = YES"
 
 branches:
   only:
