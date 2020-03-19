@@ -35,15 +35,15 @@ script:
   - chmod a+x ./gradlew
   - ./gradlew clean &>/dev/null
   - ./gradlew build &>/dev/null
-  - du -ash smali/build/libs/*.jar; du -ash baksmali/build/libs/*.jar
+  - du -sh smali/build/libs/*.jar; du -sh baksmali/build/libs/*.jar
   - cp -a smali/build/libs/*.jar baksmali/build/libs/*.jar $TRAVIS_BUILD_DIR/release/
   - ./gradlew clean &>/dev/null
   - ./gradlew build proguard &>/dev/null
-  - du -ash smali/build/libs/*.jar; du -ash baksmali/build/libs/*.jar
+  - du -sh smali/build/libs/*.jar; du -sh baksmali/build/libs/*.jar
   - cp -a smali/build/libs/*.jar baksmali/build/libs/*.jar $TRAVIS_BUILD_DIR/release/
   - cd $TRAVIS_BUILD_DIR/release/
   - ls -lAh .
-  - du -ash *
+  - du -sh *
 
 before_deploy:
   - cd $TRAVIS_BUILD_DIR
