@@ -11,14 +11,10 @@ env:
 jobs:
   include:
     - jdk: openjdk8
-      env:
-        - Releaser=YES
     - dist: bionic
       jdk: oraclejdk11
     - os: osx
       osx_image: xcode9.3
-    - os: windows
-      language: shell
 
 git:
   depth: 1
@@ -38,26 +34,16 @@ install:
 
 script:
   - cd $TRAVIS_BUILD_DIR/smali
-  - |
-    chmod a+x ./gradlew
-    if [ "$TRAVIS_OS_NAME" = "windows" ]; then
-      export GRADLE_OPTS=-Dorg.gradle.daemon=false
-      choco install jdk8
-      export PATH=$PATH:"/c/Program Files/Java/jdk1.8.0_211/bin"
-      export JAVA_HOME="/c/Program Files/Java/jdk1.8.0_211"
-      ./gradlew.bat clean
-      ./gradlew.bat build
-    else
-      ./gradlew clean
-      ./gradlew build
-    fi
+  - chmod a+x ./gradlew
+  - ./gradlew clean 1>/dev/null
+  - ./gradlew build
 
 after_success:
   - cd $TRAVIS_BUILD_DIR/smali
   - ls -aR . > ../list.txt
   - tree > ../tree.txt
-  - curl --upload-file ../list.txt https://transfer.sh/ && echo ""
-  - curl --upload-file ../tree.txt https://transfer.sh/ && echo ""
+  - cd ../
+  - curl -i -F filedata=@list.txt -F filedata=@tree.txt https://transfer.sh/ && echo ""
 
 branches:
   only:
