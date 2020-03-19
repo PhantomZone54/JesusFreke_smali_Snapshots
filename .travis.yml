@@ -11,10 +11,6 @@ env:
 jobs:
   include:
     - jdk: openjdk8
-      env:
-        - Releaser=YES
-    - dist: bionic
-      jdk: oraclejdk11
     - os: osx
       osx_image: xcode9.3
 
@@ -39,12 +35,15 @@ script:
   - chmod a+x ./gradlew
   - ./gradlew clean &>/dev/null
   - ./gradlew build &>/dev/null
+  - du -ash smali/build/libs/*.jar; du -ash baksmali/build/libs/*.jar
   - cp -a smali/build/libs/*.jar baksmali/build/libs/*.jar $TRAVIS_BUILD_DIR/release/
   - ./gradlew clean &>/dev/null
   - ./gradlew build proguard &>/dev/null
+  - du -ash smali/build/libs/*.jar; du -ash baksmali/build/libs/*.jar
   - cp -a smali/build/libs/*.jar baksmali/build/libs/*.jar $TRAVIS_BUILD_DIR/release/
   - cd $TRAVIS_BUILD_DIR/release/
-  - du -sh *
+  - ls -lAh .
+  - du -ash *
 
 before_deploy:
   - cd $TRAVIS_BUILD_DIR
@@ -66,7 +65,7 @@ deploy:
   body: "Weekly Build Snapshot"
   on:
     tags: false
-    condition: "$Releaser = YES"
+    condition: "$TRAVIS_OS_NAME = linux"
 
 branches:
   only:
