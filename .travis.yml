@@ -46,10 +46,10 @@ script:
       export PATH=$PATH:"/c/Program Files/Java/jdk1.8.0_211/bin"
       export JAVA_HOME="/c/Program Files/Java/jdk1.8.0_211"
       ./gradlew.bat clean
-      ./gradlew.bat build shadowJar proguard
+      ./gradlew.bat build
     else
       ./gradlew clean
-      ./gradlew build shadowJar proguard
+      ./gradlew build
     fi
 
 after_success:
