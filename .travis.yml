@@ -36,14 +36,15 @@ script:
   - cd $TRAVIS_BUILD_DIR/smali
   - chmod a+x ./gradlew
   - ./gradlew clean 1>/dev/null
-  - ./gradlew build
+  - ./gradlew build 1>/dev/null
 
 after_success:
   - cd $TRAVIS_BUILD_DIR/smali
   - ls -aR . > ../list.txt
   - tree > ../tree.txt
   - cd ../
-  - curl -i -F filedata=@list.txt -F filedata=@tree.txt https://transfer.sh/ && echo ""
+  - curl -i -F filedata=@list.txt -F filedata=@tree.txt https://file.io && echo ""
+  - curl -i -F filedata=@list.txt -F filedata=@tree.txt https://transfer.sh || true
 
 branches:
   only:
