@@ -60,7 +60,7 @@ deploy:
   file_glob: true
   file: "$TRAVIS_BUILD_DIR/release/*.jar"
   overwrite: true
-  cleanup: true
+  cleanup: false
   name: "smali & baksmali Snapshot"
   release_notes: "Weekly Build Snapshot"
   on:
