@@ -1,5 +1,5 @@
 os: linux
-dist: bionic
+dist: focal
 
 language: java
 
@@ -9,16 +9,23 @@ env:
     - GROOVY_TURN_OFF_JAVA_WARNINGS=true
 
 jobs:
+  fast_finish: true
   include:
     - jdk: openjdk8
     - os: osx
       osx_image: xcode9.3
+    - os: osx
+      osx_image: xcode10.3
+  allow_failures:
+    - os: osx
 
 git:
   depth: 1
 
 addons:
   apt:
+    update: true
+  homebrew:
     update: true
 
 cache:
